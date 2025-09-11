@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RapidScale — Business Consulting</title>
+  <meta name="description" content="RapidScale is a modern business consulting firm helping organizations scale with strategy, operations, and data." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%233b82f6'/%3E%3Cstop offset='1' stop-color='%238b5cf6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='12' fill='url(%23g)'/%3E%3Cpath d='M15 42l11-20 7 9 8-15 8 26' stroke='white' stroke-width='4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { DEFAULT: '#4f46e5' },
+            secondary: { DEFAULT: '#06b6d4' },
+          },
+          boxShadow: {
+            'soft': '0 10px 30px rgba(0,0,0,0.08)',
+          }
+        }
+      },
+      darkMode: 'class'
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji'; }
+    .glass { backdrop-filter: blur(10px); background: rgba(255,255,255,0.6); }
+    .dark .glass { background: rgba(24,24,27,0.6); }
+    .bg-grid {
+      background-image: radial-gradient(currentColor 0.5px, transparent 0.5px);
+      background-size: 16px 16px;
+      opacity: .08;
+    }
+    /* Simple slider */
+    .slider { position: relative; overflow: hidden; }
+    .slides { display: flex; transition: transform .6s ease; }
+    .slide { min-width: 100%; }
+    .nav-dot { width: 10px; height: 10px; border-radius: 9999px; opacity: .4; }
+    .nav-dot.active { opacity: 1; }
+    .fade-in-up { opacity: 0; transform: translateY(12px); transition: all .7s ease; }
+    .fade-in-up.appear { opacity: 1; transform: translateY(0); }
+  </style>
+  <script>
+    // Theme toggle
+    (function() {
+      const userPref = localStorage.getItem('rs-theme');
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (userPref === 'dark' || (!userPref && prefersDark)) {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('rs-theme', isDark ? 'dark' : 'light');
+    }
+    // On scroll animate
+    document.addEventListener('DOMContentLoaded', () => {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('appear'); });
+      }, { threshold: 0.12 });
+      document.querySelectorAll('.fade-in-up').forEach(el => observer.observe(el));
+      // Counter
+      const counters = document.querySelectorAll('[data-counter]');
+      const counterObs = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          const el = entry.target; const target = +el.dataset.target; const dur = 1400;
+          const start = performance.now();
+          function step(ts) {
+            const p = Math.min((ts - start) / dur, 1);
+            el.textContent = Math.round(target * p).toLocaleString();
+            if (p < 1) requestAnimationFrame(step);
+          }
+          requestAnimationFrame(step);
+          counterObs.unobserve(el);
+        });
+      }, { threshold: 0.6 });
+      counters.forEach(c => counterObs.observe(c));
+      // Simple slider
+      const slider = document.querySelector('.slider');
+      if (slider) {
+        const slides = slider.querySelector('.slides');
+        const dots = slider.querySelectorAll('.nav-dot');
+        let idx = 0;
+        function go(i) {
+          idx = (i + dots.length) % dots.length;
+          slides.style.transform = `translateX(-${idx * 100}%)`;
+          dots.forEach((d,n) => d.classList.toggle('active', n === idx));
+        }
+        setInterval(() => go(idx + 1), 5000);
+        dots.forEach((d,i) => d.addEventListener('click', () => go(i)));
+        go(0);
+      }
+      // Mobile nav close on click
+      document.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener('click', () => {
+        document.getElementById('mobileMenu')?.classList.add('hidden');
+      }))
+    });
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "RapidScale",
+    "url": "https://rapidscale.in",
+    "logo": "https://rapidscale.in/logo.svg",
+    "sameAs": ["https://www.linkedin.com"],
+    "description": "Modern business consulting — strategy, operations, data & AI."
+  }
+  </script>
+</head>
+<body class="bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100">
+  <!-- Navbar -->
+  <header class="fixed inset-x-0 top-0 z-40">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3">
+      <div class="glass shadow-soft rounded-2xl px-4 py-3 flex items-center justify-between">
+        <a href="#" class="flex items-center gap-2 font-extrabold tracking-tight text-lg">
+          <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-gradient-to-tr from-primary to-secondary text-white">R</span>
+          RapidScale
+        </a>
+        <nav class="hidden md:flex items-center gap-6 text-sm">
+          <a href="#services" class="hover:text-primary">Services</a>
+          <a href="#cases" class="hover:text-primary">Case Studies</a>
+          <a href="#about" class="hover:text-primary">About</a>
+          <a href="#insights" class="hover:text-primary">Insights</a>
+          <a href="#contact" class="hover:text-primary">Contact</a>
+        </nav>
+        <div class="flex items-center gap-2">
+          <button onclick="toggleTheme()" class="rounded-xl px-3 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800">Theme</button>
+          <a href="#contact" class="hidden sm:inline-flex rounded-xl bg-primary text-white px-4 py-2 text-sm font-semibold hover:opacity-90">Book a consult</a>
+          <button class="md:hidden rounded-xl px-3 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800" onclick="document.getElementById('mobileMenu').classList.toggle('hidden')">Menu</button>
+        </div>
+      </div>
+    </div>
+    <div id="mobileMenu" class="hidden md:hidden mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="glass rounded-2xl mt-2 px-4 py-3 flex flex-col gap-3">
+        <a href="#services">Services</a>
+        <a href="#cases">Case Studies</a>
+        <a href="#about">About</a>
+        <a href="#insights">Insights</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="relative pt-28 sm:pt-32">
+    <div class="absolute inset-0 -z-10 bg-gradient-to-b from-zinc-50 to-white dark:from-zinc-900 dark:to-zinc-950"></div>
+    <div class="absolute inset-0 -z-10 bg-grid"></div>
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-14">
+      <div class="grid md:grid-cols-2 gap-10 items-center">
+        <div class="fade-in-up">
+          <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight">
+            Scale smarter. Move faster.
+          </h1>
+          <p class="mt-4 text-lg text-zinc-600 dark:text-zinc-300">
+            RapidScale helps ambitious teams unlock growth through sharp strategy, streamlined operations, and data-driven execution.
+          </p>
+          <div class="mt-8 flex flex-wrap gap-3">
+            <a href="#services" class="rounded-xl bg-primary text-white px-5 py-3 font-semibold hover:opacity-90">Explore services</a>
+            <a href="#cases" class="rounded-xl border px-5 py-3 font-semibold hover:bg-zinc-50 dark:hover:bg-zinc-800">See our impact</a>
+          </div>
+          <div class="mt-10 grid grid-cols-3 gap-6">
+            <div>
+              <div class="text-3xl font-extrabold"><span data-counter data-target="120">0</span>+</div>
+              <div class="text-sm text-zinc-500">Projects delivered</div>
+            </div>
+            <div>
+              <div class="text-3xl font-extrabold"><span data-counter data-target="48">0</span>%</div>
+              <div class="text-sm text-zinc-500">Avg. faster time‑to‑market</div>
+            </div>
+            <div>
+              <div class="text-3xl font-extrabold"><span data-counter data-target="96">0</span>%</div>
+              <div class="text-sm text-zinc-500">Client satisfaction</div>
+            </div>
+          </div>
+        </div>
+        <div class="fade-in-up md:order-last">
+          <div class="relative">
+            <div class="absolute -inset-4 bg-gradient-to-tr from-primary to-secondary rounded-3xl blur-2xl opacity-20"></div>
+            <div class="relative bg-white dark:bg-zinc-800 rounded-3xl p-6 shadow-soft border border-zinc-100 dark:border-zinc-700">
+              <div class="text-sm font-semibold text-zinc-500 mb-3">Interactive KPI Snapshot</div>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="rounded-2xl p-4 border dark:border-zinc-700">
+                  <div class="text-xs text-zinc-500">Revenue Impact</div>
+                  <div class="mt-1 text-2xl font-bold">+32%</div>
+                  <div class="mt-3 h-2 rounded bg-zinc-200 dark:bg-zinc-700 overflow-hidden">
+                    <div class="h-2 bg-primary" style="width: 64%"></div>
+                  </div>
+                </div>
+                <div class="rounded-2xl p-4 border dark:border-zinc-700">
+                  <div class="text-xs text-zinc-500">Cost Optimization</div>
+                  <div class="mt-1 text-2xl font-bold">−18%</div>
+                  <div class="mt-3 h-2 rounded bg-zinc-200 dark:bg-zinc-700 overflow-hidden">
+                    <div class="h-2 bg-secondary" style="width: 72%"></div>
+                  </div>
+                </div>
+                <div class="col-span-2 rounded-2xl p-4 border dark:border-zinc-700">
+                  <div class="text-xs text-zinc-500">Maturity Assessment</div>
+                  <input type="range" min="1" max="5" value="3" class="w-full accent-primary" oninput="document.getElementById('maturity').textContent=this.value">
+                  <div class="mt-1 text-sm">Level: <span id="maturity" class="font-semibold">3</span> / 5</div>
+                </div>
+              </div>
+              <div class="mt-4 text-xs text-zinc-500">* Demo metrics for illustration.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section id="services" class="py-16 sm:py-20">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="fade-in-up text-center">
+        <h2 class="text-3xl sm:text-4xl font-extrabold">What we do</h2>
+        <p class="mt-3 text-zinc-600 dark:text-zinc-300 max-w-2xl mx-auto">End‑to‑end consulting across strategy, operations, and data to accelerate outcomes.</p>
+      </div>
+      <div class="mt-10 grid md:grid-cols-3 gap-6">
+        <div class="fade-in-up rounded-2xl p-6 border hover:shadow-soft transition dark:border-zinc-700">
+          <div class="text-sm font-semibold text-primary">Strategy</div>
+          <h3 class="mt-2 font-bold text-lg">Growth & GTM</h3>
+          <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-300">Market sizing, ICP, pricing, and go‑to‑market playbooks that convert.</p>
+          <ul class="mt-3 text-sm list-disc list-inside text-zinc-600 dark:text-zinc-300">
+            <li>Market & customer research</li>
+            <li>Pricing & packaging</li>
+            <li>Digital transformation</li>
+          </ul>
+        </div>
+        <div class="fade-in-up rounded-2xl p-6 border hover:shadow-soft transition dark:border-zinc-700">
+          <div class="text-sm font-semibold text-primary">Operations</div>
+          <h3 class="mt-2 font-bold text-lg">Process Excellence</h3>
+          <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-300">Roadmaps and operating models to remove bottlenecks and scale.</p>
+          <ul class="mt-3 text-sm list-disc list-inside text-zinc-600 dark:text-zinc-300">
+            <li>Org design & OKRs</li>
+            <li>Lean/Agile delivery</li>
+            <li>Vendor & risk management</li>
+          </ul>
+        </div>
+        <div class="fade-in-up rounded-2xl p-6 border hover:shadow-soft transition dark:border-zinc-700">
+          <div class="text-sm font-semibold text-primary">Data & AI</div>
+          <h3 class="mt-2 font-bold text-lg">Insights & Automation</h3>
+          <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-300">From data strategy to ML/AI pilots that drive measurable ROI.</p>
+          <ul class="mt-3 text-sm list-disc list-inside text-zinc-600 dark:text-zinc-300">
+            <li>Data platform & governance</li>
+            <li>BI dashboards</li>
+            <li>AI use‑case discovery</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Case Studies -->
+  <section id="cases" class="py-16 sm:py-20 bg-zinc-50 dark:bg-zinc-950">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="fade-in-up text-center">
+        <h2 class="text-3xl sm:text-4xl font-extrabold">Selected impact</h2>
+        <p class="mt-3 text-zinc-600 dark:text-zinc-300 max-w-2xl mx-auto">Real outcomes we’ve helped deliver across industries.</p>
+      </div>
+      <div class="mt-10 grid md:grid-cols-3 gap-6">
+        <article class="fade-in-up rounded-2xl p-6 border dark:border-zinc-700 bg-white dark:bg-zinc-900">
+          <div class="text-xs font-semibold text-primary">SaaS</div>
+          <h3 class="mt-1 font-bold">Revamp GTM to unlock ARR</h3>
+          <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-300">Refined ICP and pricing, delivering +38% ARR in 2 quarters.</p>
+          <a href="#contact" class="mt-3 inline-block text-sm font-semibold text-primary">Learn more →</a>
+        </article>
+        <article class="fade-in-up rounded-2xl p-6 border dark:border-zinc-700 bg-white dark:bg-zinc-900">
+          <div class="text-xs font-semibold text-primary">Manufacturing</div>
+          <h3 class="mt-1 font-bold">Lean ops transformation</h3>
+          <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-300">Cycle time down 27% by redesigning supply workflows.</p>
+          <a href="#contact" class="mt-3 inline-block text-sm font-semibold text-primary">Learn more →</a>
+        </article>
+        <article class="fade-in-up rounded-2xl p-6 border dark:border-zinc-700 bg-white dark:bg-zinc-900">
+          <div class="text-xs font-semibold text-primary">Retail</div>
+          <h3 class="mt-1 font-bold">Data to decisions</h3>
+          <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-300">Built a unified BI layer; margins up 6 pts in 6 months.</p>
+          <a href="#contact" class="mt-3 inline-block text-sm font-semibold text-primary">Learn more →</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section id="about" class="py-16 sm:py-20">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="fade-in-up text-center">
+        <h2 class="text-3xl sm:text-4xl font-extrabold">Why RapidScale</h2>
+        <p class="mt-3 text-zinc-600 dark:text-zinc-300 max-w-2xl mx-auto">A boutique partner with senior expertise and hands‑on delivery.</p>
+      </div>
+      <div class="mt-10 grid md:grid-cols-3 gap-6">
+        <div class="fade-in-up rounded-2xl p-6 border dark:border-zinc-700">
+          <h3 class="font-semibold">Senior‑led squads</h3>
+          <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-300">Small teams of specialists who’ve shipped at scale.</p>
+        </div>
+        <div class="fade-in-up rounded-2xl p-6 border dark:border-zinc-700">
+          <h3 class="font-semibold">Outcome‑first</h3>
+          <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-300">Clear hypotheses, measurable value, frequent iteration.</p>
+        </div>
+        <div class="fade-in-up rounded-2xl p-6 border dark:border-zinc-700">
+          <h3 class="font-semibold">Transparent delivery</h3>
+          <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-300">Roadmaps, demos, and weekly scorecards you can trust.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Insights / Slider -->
+  <section id="insights" class="py-16 sm:py-20 bg-zinc-50 dark:bg-zinc-950">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="fade-in-up text-center">
+        <h2 class="text-3xl sm:text-4xl font-extrabold">Insights</h2>
+        <p class="mt-3 text-zinc-600 dark:text-zinc-300 max-w-2xl mx-auto">Short takes on growth, ops, and data.</p>
+      </div>
+      <div class="mt-8 slider rounded-3xl border dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-soft">
+        <div class="slides">
+          <div class="slide p-8">
+            <h3 class="font-bold text-xl">The 6‑week operating rhythm</h3>
+            <p class="mt-2 text-zinc-600 dark:text-zinc-300">Why 6‑week cycles create focus, momentum, and measurable impact.</p>
+          </div>
+          <div class="slide p-8">
+            <h3 class="font-bold text-xl">From data to decisions</h3>
+            <p class="mt-2 text-zinc-600 dark:text-zinc-300">How to design KPIs that actually influence behavior.</p>
+          </div>
+          <div class="slide p-8">
+            <h3 class="font-bold text-xl">Pragmatic AI adoption</h3>
+            <p class="mt-2 text-zinc-600 dark:text-zinc-300">Five low‑risk use‑cases to pilot now (and how to measure ROI).</p>
+          </div>
+        </div>
+        <div class="flex items-center justify-center gap-2 p-4">
+          <button class="nav-dot active bg-zinc-400"></button>
+          <button class="nav-dot bg-zinc-400"></button>
+          <button class="nav-dot bg-zinc-400"></button>
+        </div>
+      </div>
+      <details class="mt-8 rounded-2xl border p-6 dark:border-zinc-700">
+        <summary class="font-semibold cursor-pointer">FAQ — How do engagements work?</summary>
+        <div class="mt-3 text-sm text-zinc-600 dark:text-zinc-300">
+          We start with a discovery sprint to align on outcomes, then run 6‑week cycles with weekly scorecards and demo days.
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact" class="py-16 sm:py-20">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="fade-in-up text-center">
+        <h2 class="text-3xl sm:text-4xl font-extrabold">Let’s talk</h2>
+        <p class="mt-3 text-zinc-600 dark:text-zinc-300 max-w-2xl mx-auto">Tell us about your goals. We’ll reply within 1 business day.</p>
+      </div>
+      <div class="mt-10 grid md:grid-cols-2 gap-6">
+        <form name="contact" method="POST" data-netlify="true" class="rounded-2xl p-6 border dark:border-zinc-700 shadow-soft bg-white dark:bg-zinc-900">
+          <input type="hidden" name="form-name" value="contact">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="text-sm">Name</label>
+              <input name="name" required class="mt-1 w-full rounded-xl border px-3 py-2 dark:bg-zinc-800 dark:border-zinc-700" />
+            </div>
+            <div>
+              <label class="text-sm">Email</label>
+              <input type="email" name="email" required class="mt-1 w-full rounded-xl border px-3 py-2 dark:bg-zinc-800 dark:border-zinc-700" />
+            </div>
+            <div class="sm:col-span-2">
+              <label class="text-sm">Company</label>
+              <input name="company" class="mt-1 w-full rounded-xl border px-3 py-2 dark:bg-zinc-800 dark:border-zinc-700" />
+            </div>
+            <div class="sm:col-span-2">
+              <label class="text-sm">How can we help?</label>
+              <textarea name="message" rows="4" required class="mt-1 w-full rounded-xl border px-3 py-2 dark:bg-zinc-800 dark:border-zinc-700"></textarea>
+            </div>
+          </div>
+          <button class="mt-4 rounded-xl bg-primary text-white px-5 py-3 font-semibold hover:opacity-90" type="submit">Send message</button>
+          <p class="mt-3 text-xs text-zinc-500">This form works out‑of‑the‑box on Netlify (free). If hosting elsewhere, replace with your form endpoint.</p>
+        </form>
+        <div class="rounded-2xl p-6 border dark:border-zinc-700 bg-white dark:bg-zinc-900">
+          <div class="text-sm font-semibold text-primary">Contact details</div>
+          <div class="mt-3 space-y-2 text-sm text-zinc-600 dark:text-zinc-300">
+            <div>✉️ hello@rapidscale.in</div>
+            <div>📍 Remote‑first, serving clients globally</div>
+            <div>🗓️ Mon–Fri, 9:00–18:00 IST</div>
+          </div>
+          <div class="mt-6 rounded-xl overflow-hidden border dark:border-zinc-700">
+            <iframe title="Map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+              src="https://www.openstreetmap.org/export/embed.html?bbox=72.77,18.90,72.99,19.05&layer=mapnik"
+              class="w-full h-56"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-10 border-t dark:border-zinc-800">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-sm flex flex-col sm:flex-row gap-4 items-center justify-between">
+      <div class="text-zinc-500">© <span id="year"></span> RapidScale. All rights reserved.</div>
+      <div class="flex items-center gap-4">
+        <a href="#about" class="hover:text-primary">About</a>
+        <a href="#services" class="hover:text-primary">Services</a>
+        <a href="#contact" class="hover:text-primary">Contact</a>
+      </div>
+    </div>
+    <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+  </footer>
+
+  <!-- Back to top -->
+  <a href="#top" class="fixed bottom-6 right-6 rounded-full shadow-soft bg-primary text-white w-12 h-12 inline-flex items-center justify-center">↑</a>
+</body>
+</html>
